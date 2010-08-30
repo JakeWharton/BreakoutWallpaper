@@ -15,7 +15,8 @@ public class Ball {
 	
 	
 	private final PointF mLocation;
-	private final PointF mVector;
+	private float mVectorX;
+	private float mVectorY;
 	private float mRadius;
 	
 	
@@ -26,7 +27,8 @@ public class Ball {
 		}
 		
 		this.mLocation = new PointF(0, 0);
-		this.mVector = new PointF(0, 0);
+		this.mVectorX = 0;
+		this.mVectorY = 0;
 
 		if (Wallpaper.LOG_VERBOSE) {
 			Log.v(Ball.TAG, "< Ball()");
@@ -51,25 +53,25 @@ public class Ball {
 		return this.mRadius;
 	}
 	
-	public PointF getVector() {
-		return this.mVector;
+	public float getVectorY() {
+		return this.mVectorX;
 	}
 	
-	public void setVector(final float x, final float y) {
-		this.mVector.set(x, y);
+	public float getVectorX() {
+		return this.mVectorY;
 	}
 	
-	public void toggleVectorX() {
-		this.mVector.x = 0 - this.mVector.x;
+	public void setVectorX(final float x) {
+		this.mVectorX = x;
 	}
 	
-	public void toggleVectorY() {
-		this.mVector.y = 0 - this.mVector.y;
+	public void setVectorY(final float y) {
+		this.mVectorY = y;
 	}
 	
 	public void tick(final Game game) {
-		this.mLocation.x += this.mVector.x;
-		this.mLocation.y += this.mVector.y;
+		this.mLocation.x += this.mVectorX;
+		this.mLocation.y += this.mVectorY;
 	}
 	
 	public void performResize(final Game game) {
