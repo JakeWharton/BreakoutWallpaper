@@ -539,50 +539,33 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	for (final Ball ball : this.mBalls) {
     		ball.tick(this);
     		
-    		//Test neighboring block collisions
-    		final PointF ballLocation = ball.getLocation();
-    		final float ballRadius = ball.getRadius();
-    		final RectF ballCircumscribed = new RectF(ballLocation.x - ballRadius, ballLocation.y - ballRadius, ballLocation.x + ballRadius, ballLocation.y + ballRadius);
-    		final int ballX = (int)(ballLocation.x / this.mCellWidth);
-    		final int ballY = (int)(ballLocation.y / this.mCellHeight);
+    		final int ballCheckHorizontalX = (int)((ball.getLocation().x + (Math.signum(ball.getVector().x) * ball.getRadius())) / this.mCellWidth);
+    		final int ballCheckHorizontalY = (int)(ball.getLocation().y / this.mCellHeight);
+    		final int ballCheckVerticalX = (int)(ball.getLocation().x / this.mCellWidth);
+    		final int ballCheckVerticalY = (int)((ball.getLocation().y + (Math.signum(ball.getVector().y)* ball.getRadius())) / this.mCellHeight);
     		
     		//Test screen edges
     		boolean doContinue = false;
-    		if ((ballCircumscribed.top <= 0) || (ballCircumscribed.bottom > (this.mCellsTall * this.mCellHeight))) {
-    			ball.toggleVectorY();
+    		if ((ballCheckHorizontalX < 0) || (ballCheckHorizontalX >= this.mCellsWide)) {
+    			ball.toggleVectorX();
     			doContinue = true;
     		}
-    		if ((ballCircumscribed.left <= 0) || (ballCircumscribed.right > (this.mCellsWide * this.mCellWidth))) {
-    			ball.toggleVectorX();
+    		if ((ballCheckVerticalY < 0) || (ballCheckVerticalY >= this.mCellsTall)) {
+    			ball.toggleVectorY();
     			doContinue = true;
     		}
     		if (doContinue) {
     			continue;
     		}
     		
-    		//Test bounding blocks
-    		//XXX: The following probably needs optimized.
-    		for (int dx = -1; dx <= 1; dx++) {
-    			for (int dy = -1; dy <= 1; dy++) {
-    				final int blockX = ballX + dx;
-    				final int blockY = ballY + dy;
-    				if (this.isBlock(blockX, blockY)) {
-    					final RectF block = new RectF(blockX * this.mCellWidth, blockY * this.mCellHeight, (blockX + 1) * this.mCellWidth, (blockY + 1) * this.mCellHeight);
-    					if (RectF.intersects(ballCircumscribed, block)) {
-    						this.mBoard[blockY][blockX] = Game.CELL_BLANK;
-    						this.mBricksRemaining -= 1;
-    						
-    						//Adjust ball movement vector
-    						//XXX: broken
-    						if (Math.signum(dx) == Math.signum(ball.getVector().x)) {
-    							ball.toggleVectorX();
-    						}
-    						if (Math.signum(dy) == Math.signum(ball.getVector().y)) {
-    							ball.toggleVectorY();
-    						}
-    					}
-    				}
-    			}
+    		//Test blocks
+    		if (this.isBlock(ballCheckHorizontalX, ballCheckHorizontalY)) {
+    			ball.toggleVectorX();
+    			this.mBoard[ballCheckHorizontalY][ballCheckHorizontalX] = Game.CELL_BLANK;
+    		}
+    		if (this.isBlock(ballCheckVerticalX, ballCheckVerticalY)) {
+    			ball.toggleVectorY();
+    			this.mBoard[ballCheckVerticalY][ballCheckVerticalX] = Game.CELL_BLANK;
     		}
     	}
     	
