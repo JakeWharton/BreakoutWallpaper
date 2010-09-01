@@ -29,7 +29,7 @@ public class Wallpaper extends WallpaperService {
 	/**
 	 * Whether or not we are logging in debug mode.
 	 */
-	/*package*/static final boolean LOG_DEBUG = true;
+	/*package*/static final boolean LOG_DEBUG = false;
 	
 	/**
 	 * Whether or not we are logging in verbose mode.
@@ -39,7 +39,7 @@ public class Wallpaper extends WallpaperService {
 	/**
 	 * Whether or not the wallpaper should automatically advance to the next frame.
 	 */
-    private static final boolean AUTO_FPS = false;
+    private static final boolean AUTO_FPS = true;
     
     /**
      * Height (in DIP) of the status bar. Usually.

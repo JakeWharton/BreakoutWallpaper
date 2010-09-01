@@ -568,6 +568,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		this.checkCollision(ball, ballCheck1X, ballCheck1Y);
     		this.checkCollision(ball, ballCheck2X, ballCheck2Y);
     		this.checkCollision(ball, ballCheck3X, ballCheck3Y);
+    		this.checkCollision(ball, ballCheck3X, (int)(ball.getLocation().y / this.mCellHeight));
     	}
     	
     	if (this.mBricksRemaining <= 0) {
@@ -603,17 +604,20 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		final float circleR = ball.getRadius();
 		final float blockCenterX = (blockX * this.mCellWidth) + cellWidthOverTwo;
 		final float blockCenterY = (blockY * this.mCellHeight) + cellHeightOverTwo;
-		final float circleDistanceX = Math.abs(ball.getLocation().x - blockCenterX - cellWidthOverTwo);
-		final float circleDistanceY = Math.abs(ball.getLocation().y - blockCenterY - cellHeightOverTwo);
+		final float circleDistanceX = Math.abs(ball.getLocation().x - blockCenterX);
+		final float circleDistanceY = Math.abs(ball.getLocation().y - blockCenterY);
 		
 		if ((circleDistanceX > (cellWidthOverTwo + circleR)) || (circleDistanceY > (cellHeightOverTwo + circleR))) {
 			return false;
 		}
 		
-		final double cornerDistance_sq = Math.pow(circleDistanceX + cellWidthOverTwo, 2) + Math.pow(circleDistanceY + cellHeightOverTwo, 2);
-		if ((circleDistanceX > cellWidthOverTwo) && (circleDistanceY > cellHeightOverTwo) && (cornerDistance_sq > Math.pow(circleR, 2))) {
+		final double circleDistanceSquared = Math.pow(circleDistanceX, 2) + Math.pow(circleDistanceY, 2);
+		final double maxDistanceSquared = Math.pow(cellWidthOverTwo, 2) + Math.pow(cellHeightOverTwo, 2) + Math.pow(circleR, 2);
+		if ((circleDistanceX > cellWidthOverTwo) && (circleDistanceY > cellHeightOverTwo) && (circleDistanceSquared > maxDistanceSquared)) {
 			return false;
 		}
+		
+		//If we're here, we collided
 		
 		if (Wallpaper.LOG_DEBUG) {
 			Log.d(Game.TAG, "-- Is Collision");
