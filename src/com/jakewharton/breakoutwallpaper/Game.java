@@ -575,10 +575,27 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	}
     }
     
-	private void checkCollision(final Ball ball, final int blockX, final int blockY)
+    /**
+     * Determine if a ball has collided with a brick in the specified coordinates.
+     * 
+     * @param ball Ball instance.
+     * @param blockX X coordinate of potential brick.
+     * @param blockY Y coordinate of potential brick.
+     * @return Boolean indicating collision.
+     */
+	private boolean checkCollision(final Ball ball, final int blockX, final int blockY)
 	{
+		if (Wallpaper.LOG_DEBUG) {
+			Log.d(Game.TAG, "Checking: (" + blockX + "," + blockY + ")");
+			Log.d(Game.TAG, "Ball: (" + ball.getLocation().x + "," + ball.getLocation().y + ")");
+		}
+		
 		if (!this.isBlock(blockX, blockY)) {
-			return;
+			return false;
+		}
+		
+		if (Wallpaper.LOG_DEBUG) {
+			Log.d(Game.TAG, "-- Is Block");
 		}
 		
 		final float cellWidthOverTwo = this.mCellWidth / 2.0f;
@@ -590,13 +607,44 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		final float circleDistanceY = Math.abs(ball.getLocation().y - blockCenterY - cellHeightOverTwo);
 		
 		if ((circleDistanceX > (cellWidthOverTwo + circleR)) || (circleDistanceY > (cellHeightOverTwo + circleR))) {
-			return;
+			return false;
 		}
 		
-		final double cornerDistance_sq = Math.pow(circleDistanceX - cellWidthOverTwo, 2) + Math.pow(circleDistanceY - cellHeightOverTwo, 2);
-		if ((circleDistanceX <= cellWidthOverTwo) || (circleDistanceY <= cellHeightOverTwo) || (cornerDistance_sq <= Math.pow(circleR, 2))) {
-			//TODO: bounce!
+		final double cornerDistance_sq = Math.pow(circleDistanceX + cellWidthOverTwo, 2) + Math.pow(circleDistanceY + cellHeightOverTwo, 2);
+		if ((circleDistanceX > cellWidthOverTwo) && (circleDistanceY > cellHeightOverTwo) && (cornerDistance_sq > Math.pow(circleR, 2))) {
+			return false;
 		}
+		
+		if (Wallpaper.LOG_DEBUG) {
+			Log.d(Game.TAG, "-- Is Collision");
+			Log.d(Game.TAG, "-- Current Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
+		}
+		
+		float collisionUnitVectorX = ball.getLocation().x - blockCenterX;
+		float collisionUnitVectorY = ball.getLocation().y - blockCenterY;
+		final double collisionVectorLength = Math.sqrt(Math.pow(collisionUnitVectorX, 2) + Math.pow(collisionUnitVectorY, 2));
+		collisionUnitVectorX /= collisionVectorLength;
+		collisionUnitVectorY /= collisionVectorLength;
+		
+		final double ballVectorLength = Math.sqrt(Math.pow(ball.getVectorX(), 2) + Math.pow(ball.getVectorY(), 2));
+		final float ballUnitVectorX = (float)(ball.getVectorX() / ballVectorLength);
+		final float ballUnitVectorY = (float)(ball.getVectorY() / ballVectorLength);
+		
+		final float dotProduct = (collisionUnitVectorX * ballUnitVectorX) + (collisionUnitVectorY * ballUnitVectorY);
+		final float vectorDeltaX = 2 * -collisionUnitVectorX * dotProduct;
+		final float vectorDeltaY = 2 * -collisionUnitVectorY * dotProduct;
+		
+		ball.setVectorX(ball.getVectorX() + vectorDeltaX);
+		ball.setVectorY(ball.getVectorY() + vectorDeltaY);
+		
+		if (Wallpaper.LOG_DEBUG) {
+			Log.d(Game.TAG, "-- New Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
+		}
+		
+		this.mBoard[blockY][blockX] = Game.CELL_BLANK;
+		this.mBricksRemaining -= 1;
+		
+		return true;
 	}
 
     /**

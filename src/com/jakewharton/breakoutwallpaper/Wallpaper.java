@@ -39,7 +39,7 @@ public class Wallpaper extends WallpaperService {
 	/**
 	 * Whether or not the wallpaper should automatically advance to the next frame.
 	 */
-    private static final boolean AUTO_FPS = true;
+    private static final boolean AUTO_FPS = false;
     
     /**
      * Height (in DIP) of the status bar. Usually.
