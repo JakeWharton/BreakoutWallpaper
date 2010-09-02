@@ -11,6 +11,7 @@ public class Ball {
 	private static final String TAG = "BreakoutWallpaper.Ball";
 	/*package*/static final float SIZE_PERCENTAGE = 0.75f;
 	/*package*/static float RADIUS = 0;
+	/*package*/static final int SPEED = 5;
 	
 	
 	

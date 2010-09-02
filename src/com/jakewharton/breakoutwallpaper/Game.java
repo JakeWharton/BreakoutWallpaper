@@ -85,6 +85,10 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
      */
     private int mScreenWidth;
     
+    private int mGameWidth;
+    
+    private int mGameHeight;
+    
     /**
      * Whether or not the screen is currently in landscape mode.
      */
@@ -116,22 +120,22 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     /**
      * Top padding (in pixels) of the grid from the screen top.
      */
-    private float mDotGridPaddingTop;
+    private int mDotGridPaddingTop;
     
     /**
      * Left padding (in pixels) of the grid from the screen left.
      */
-    private float mDotGridPaddingLeft;
+    private int mDotGridPaddingLeft;
     
     /**
      * Bottom padding (in pixels) of the grid from the screen bottom.
      */
-    private float mDotGridPaddingBottom;
+    private int mDotGridPaddingBottom;
     
     /**
      * Right padding (in pixels) of the grid from the screen right.
      */
-    private float mDotGridPaddingRight;
+    private int mDotGridPaddingRight;
     
     /**
      * Path to the user background image (if any).
@@ -451,7 +455,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		double closestDistance = Float.MAX_VALUE;
 		Ball closestBall = null;
 		for (final Ball ball : this.mBalls) {
-			final double ballDistance = Math.sqrt(Math.pow(ball.getLocationX() - x, 2) + Math.pow(ball.getLocationY(), 2));
+			final double ballDistance = Math.sqrt(Math.pow(ball.getLocationX() - x, 2) + Math.pow(ball.getLocationY() - y, 2));
 			if (ballDistance < closestDistance) {
 				closestBall = ball;
 				closestDistance = ballDistance;
@@ -459,8 +463,10 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		}
 		
 		//Normalize new direction
-		closestBall.setVectorX((float)(Math.abs(closestBall.getLocationX() - x) / closestDistance));
-		closestBall.setVectorY((float)(Math.abs(closestBall.getLocationY() - y) / closestDistance));
+		float newVectorX = (float)(Math.abs(closestBall.getLocationX() - x) / closestDistance);
+		float newVectorY = (float)(Math.abs(closestBall.getLocationY() - y) / closestDistance);
+		closestBall.setVectorX(newVectorX * Ball.SPEED);
+		closestBall.setVectorY(newVectorY * Ball.SPEED);
 	}
     
     /**
@@ -541,21 +547,15 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		ball.tick(this);
 
     		//Test screen edges
-    		final int ballCheckVertical = (int)((ball.getLocationY() + (Math.signum(ball.getVectorY()) * Ball.RADIUS)) / this.mCellHeight);
-    		final int ballCheckHorizontal = (int)((ball.getLocationX() + (Math.signum(ball.getVectorX()) * Ball.RADIUS)) / this.mCellWidth);
-    		boolean doContinue = false;
-    		if ((ballCheckVertical < 0) || (ballCheckVertical >= this.mCellsTall)) {
-    			//reverse y vector
-    			ball.setVectorY(ball.getVectorY() * -1);
-    			doContinue = true;
+    		if (ball.getLocationX() <= 0) {
+    			ball.setVectorX(Math.abs(ball.getVectorX()));
+    		} else if (ball.getLocationX() >= this.mGameWidth) {
+    			ball.setVectorX(-Math.abs(ball.getVectorX()));
     		}
-    		if ((ballCheckHorizontal < 0) || (ballCheckHorizontal >= this.mCellsWide)) {
-    			//reverse x vector
-    			ball.setVectorX(ball.getVectorX() * -1);
-    			doContinue = true;
-    		}
-    		if (doContinue) {
-    			continue;
+    		if (ball.getLocationY() <= 0) {
+    			ball.setVectorY(Math.abs(ball.getVectorY()));
+    		} else if (ball.getLocationY() >= this.mGameHeight) {
+    			ball.setVectorY(-Math.abs(ball.getVectorY()));
     		}
     		
     		//Test blocks
@@ -598,26 +598,35 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 			Log.d(Game.TAG, "-- Current Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
 		}
 		
-		final float cellWidthOverTwo = this.mCellWidth / 2.0f;
-		final float cellHeightOverTwo = this.mCellHeight / 2.0f;
+		final float cellWidthOverTwo = this.mCellWidth / 2;
+		final float cellHeightOverTwo = this.mCellHeight / 2;
 		final float blockCenterX = (blockX * this.mCellWidth) + cellWidthOverTwo;
 		final float blockCenterY = (blockY * this.mCellHeight) + cellHeightOverTwo;
-		float collisionUnitVectorX = ball.getLocationX() - blockCenterX;
-		float collisionUnitVectorY = ball.getLocationY() - blockCenterY;
-		final double collisionVectorLength = Math.sqrt(Math.pow(collisionUnitVectorX, 2) + Math.pow(collisionUnitVectorY, 2));
+		
+		//Calculate collision unit vector
+		float collisionUnitVectorX = blockCenterX - ball.getLocationX();
+		float collisionUnitVectorY = blockCenterY - ball.getLocationY();
+		final float collisionVectorLength = (float)Math.sqrt(Math.pow(collisionUnitVectorX, 2) + Math.pow(collisionUnitVectorY, 2));
 		collisionUnitVectorX /= collisionVectorLength;
 		collisionUnitVectorY /= collisionVectorLength;
 		
-		final double ballVectorLength = Math.sqrt(Math.pow(ball.getVectorX(), 2) + Math.pow(ball.getVectorY(), 2));
-		final float ballUnitVectorX = (float)(ball.getVectorX() / ballVectorLength);
-		final float ballUnitVectorY = (float)(ball.getVectorY() / ballVectorLength);
+		//Calculate ball velocity unit vector
+		final float ballVectorLength = (float)Math.sqrt(Math.pow(ball.getVectorX(), 2) + Math.pow(ball.getVectorY(), 2));
+		final float ballUnitVectorX = ball.getVectorX() / ballVectorLength;
+		final float ballUnitVectorY = ball.getVectorY() / ballVectorLength;
 		
 		final float dotProduct = (collisionUnitVectorX * ballUnitVectorX) + (collisionUnitVectorY * ballUnitVectorY);
-		final float vectorDeltaX = -2 * collisionUnitVectorX * dotProduct;
-		final float vectorDeltaY = -2 * collisionUnitVectorY * dotProduct;
+		final float vectorDeltaX = -2 * collisionUnitVectorX * dotProduct * ballVectorLength;
+		final float vectorDeltaY = -2 * collisionUnitVectorY * dotProduct * ballVectorLength;
 		
-		ball.setVectorX(ball.getVectorX() + vectorDeltaX);
-		ball.setVectorY(ball.getVectorY() + vectorDeltaY);
+		float newVectorX = ball.getVectorX() + vectorDeltaX;
+		float newVectorY = ball.getVectorY() + vectorDeltaY;
+		final float newVectorLength = (float)Math.sqrt(Math.pow(newVectorX, 2) + Math.pow(newVectorY, 2));
+		newVectorX /= newVectorLength;
+		newVectorY /= newVectorLength;
+		
+		ball.setVectorX(newVectorX * Ball.SPEED);
+		ball.setVectorY(newVectorY * Ball.SPEED);
 		
 		if (Wallpaper.LOG_DEBUG) {
 			Log.d(Game.TAG, "-- New Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
@@ -687,11 +696,15 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	this.mScreenHeight = screenHeight;
     	
     	if (this.mIsLandscape) {
-    		this.mCellWidth = (screenWidth - this.mDotGridPaddingTop) / (this.mCellsWide * 1.0f);
-    		this.mCellHeight = (screenHeight - (this.mDotGridPaddingBottom + this.mDotGridPaddingLeft + this.mDotGridPaddingRight)) / (this.mCellsTall * 1.0f);
+    		this.mGameWidth = (screenWidth - this.mDotGridPaddingTop);
+    		this.mCellWidth = this.mGameWidth / (this.mCellsWide * 1.0f);
+    		this.mGameHeight = (screenHeight - (this.mDotGridPaddingBottom + this.mDotGridPaddingLeft + this.mDotGridPaddingRight));
+    		this.mCellHeight = this.mGameHeight / (this.mCellsTall * 1.0f);
     	} else {
-    		this.mCellWidth = (screenWidth - (this.mDotGridPaddingLeft + this.mDotGridPaddingRight)) / (this.mCellsWide * 1.0f);
-    		this.mCellHeight = (screenHeight - (this.mDotGridPaddingTop + this.mDotGridPaddingBottom)) / (this.mCellsTall * 1.0f);
+    		this.mGameWidth = (screenWidth - (this.mDotGridPaddingLeft + this.mDotGridPaddingRight));
+    		this.mCellWidth = this.mGameWidth / (this.mCellsWide * 1.0f);
+    		this.mGameHeight = (screenHeight - (this.mDotGridPaddingTop + this.mDotGridPaddingBottom));
+    		this.mCellHeight = this.mGameHeight / (this.mCellsTall * 1.0f);
     	}
     	
     	//Update cell size
@@ -705,21 +718,21 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	//TODO: this should be in newGame();
     	final PointF ball0Location = this.getBallLocationAtIcon(0, 0);
     	this.mBalls[0].setLocation(ball0Location.x, ball0Location.y);
-    	this.mBalls[0].setVectorY(-3);
+    	this.mBalls[0].setVectorY(-Ball.SPEED);
     	if (this.mBalls.length > 1) {
     		final PointF ball1Location = this.getBallLocationAtIcon(this.mIconCols - 1, this.mIconRows - 1);
     		this.mBalls[1].setLocation(ball1Location.x, ball1Location.y);
-        	this.mBalls[1].setVectorY(3);
+        	this.mBalls[1].setVectorY(Ball.SPEED);
     	}
     	if (this.mBalls.length > 2) {
     		final PointF ball2Location = this.getBallLocationAtIcon(this.mIconCols - 1, 0);
     		this.mBalls[2].setLocation(ball2Location.x, ball2Location.y);
-        	this.mBalls[2].setVectorX(3);
+        	this.mBalls[2].setVectorX(Ball.SPEED);
     	}
     	if (this.mBalls.length > 3) {
     		final PointF ball3Location = this.getBallLocationAtIcon(0, this.mIconRows - 1);
     		this.mBalls[3].setLocation(ball3Location.x, ball3Location.y);
-        	this.mBalls[3].setVectorX(-3);
+        	this.mBalls[3].setVectorX(-Ball.SPEED);
     	}
     	
     	if (Wallpaper.LOG_DEBUG) {
