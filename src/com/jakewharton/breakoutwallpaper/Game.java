@@ -43,6 +43,10 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	 */
 	private static final int CELLS_BETWEEN_COLUMN = 1;
 	
+	private static final int PAINT_STYLE_FILL = 0;
+	
+	private static final int PAINT_STYLE_STROKE = 1;
+	
 
 	
 	/**
@@ -290,6 +294,56 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 			
 			if (Wallpaper.LOG_DEBUG) {
 				Log.d(Game.TAG, "Background Image Opacity: " + this.mBackgroundPaint.getAlpha());
+			}
+		}
+		
+		final String blockStyle = resources.getString(R.string.settings_color_blockstyle_key);
+		if (all || key.equals(blockStyle)) {
+			final int blockStyleValue = preferences.getInt(blockStyle, resources.getInteger(R.integer.color_blockstyle_default));
+			switch (blockStyleValue) {
+				case Game.PAINT_STYLE_FILL:
+					this.mBlockForeground.setStyle(Paint.Style.FILL);
+					
+					if (Wallpaper.LOG_DEBUG) {
+						Log.d(Game.TAG, "Block Style: FILL");
+					}
+					break;
+					
+				case Game.PAINT_STYLE_STROKE:
+					this.mBlockForeground.setStyle(Paint.Style.STROKE);
+					
+					if (Wallpaper.LOG_DEBUG) {
+						Log.d(Game.TAG, "Block Style: STROKE");
+					}
+					break;
+					
+				default:
+					Log.e(Game.TAG, "Invalid block style value " + blockStyleValue);
+			}
+		}
+		
+		final String ballStyle = resources.getString(R.string.settings_color_ballstyle_key);
+		if (all || key.equals(ballStyle)) {
+			final int ballStyleValue = preferences.getInt(ballStyle, resources.getInteger(R.integer.color_ballstyle_default));
+			switch (ballStyleValue) {
+				case Game.PAINT_STYLE_FILL:
+					this.mBallForeground.setStyle(Paint.Style.FILL);
+					
+					if (Wallpaper.LOG_DEBUG) {
+						Log.d(Game.TAG, "Ball Style: FILL");
+					}
+					break;
+					
+				case Game.PAINT_STYLE_STROKE:
+					this.mBallForeground.setStyle(Paint.Style.STROKE);
+					
+					if (Wallpaper.LOG_DEBUG) {
+						Log.d(Game.TAG, "Ball Style: STROKE");
+					}
+					break;
+					
+				default:
+					Log.e(Game.TAG, "Invalid ball style value " + ballStyleValue);
 			}
 		}
     	

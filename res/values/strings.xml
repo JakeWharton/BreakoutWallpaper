@@ -105,6 +105,13 @@
     <string name="settings_color_bgimageclear_key">color_game_bgimage_clear</string>
     <string name="settings_color_bgimageclear_toast">Background image cleared.</string>
     <string name="settings_color_bgimageclear_summary"></string>
+    <string name="settings_color_style_header">Drawing Style</string>
+    <string name="settings_color_blockstyle">Block Drawing Style</string>
+    <string name="settings_color_blockstyle_key">color_blockstyle</string>
+    <string name="settings_color_blockstyle_summary">Fill or stroke</string>
+    <string name="settings_color_ballstyle">Ball Drawing Style</string>
+    <string name="settings_color_ballstyle_key">color_ballstyle</string>
+    <string name="settings_color_ballstyle_summary">Fill or stroke</string>
     <string name="settings_color_reset">Reset Color Settings</string>
     <string name="settings_color_reset_key">color_reset</string>
     <string name="settings_color_reset_summary">All color settings back to default</string>

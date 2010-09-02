@@ -512,6 +512,10 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
 		editor.putString(resources.getString(R.string.settings_color_bgimage_key), null);
 		//background opacity
 		editor.putInt(resources.getString(R.string.settings_color_bgopacity_key), resources.getInteger(R.integer.color_bgopacity_default));
+		//block style
+		editor.putInt(resources.getString(R.string.settings_color_blockstyle_key), resources.getInteger(R.integer.color_blockstyle_default));
+		//ball style
+		editor.putInt(resources.getString(R.string.settings_color_ballstyle_key), resources.getInteger(R.integer.color_ballstyle_default));
 		
 		editor.commit();
     }

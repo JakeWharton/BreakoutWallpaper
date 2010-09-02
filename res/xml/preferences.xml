@@ -165,6 +165,24 @@
 			</PreferenceCategory>
 			
 			<PreferenceCategory
+				android:title="@string/settings_color_style_header">
+				<com.jakewharton.utilities.IntegerListPreference
+					android:key="@string/settings_color_blockstyle_key"
+					android:title="@string/settings_color_blockstyle"
+					android:summary="@string/settings_color_blockstyle_summary"
+					android:defaultValue="@integer/color_blockstyle_default"
+					android:entries="@array/color_style"
+					android:entryValues="@array/color_style_values"/>
+				<com.jakewharton.utilities.IntegerListPreference
+					android:key="@string/settings_color_ballstyle_key"
+					android:title="@string/settings_color_ballstyle"
+					android:summary="@string/settings_color_ballstyle_summary"
+					android:defaultValue="@integer/color_ballstyle_default"
+					android:entries="@array/color_style"
+					android:entryValues="@array/color_style_values"/>
+			</PreferenceCategory>
+			
+			<PreferenceCategory
 				android:key="@string/settings_reset_key"
 				android:title="@string/settings_reset">
 				<Preference
