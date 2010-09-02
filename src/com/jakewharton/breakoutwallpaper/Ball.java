@@ -1,6 +1,5 @@
 package com.jakewharton.breakoutwallpaper;
 
-import android.graphics.PointF;
 import android.util.Log;
 
 /**
@@ -10,14 +9,15 @@ import android.util.Log;
  */
 public class Ball {
 	private static final String TAG = "BreakoutWallpaper.Ball";
-	private static final float SIZE_PERCENTAGE = 0.75f;
+	/*package*/static final float SIZE_PERCENTAGE = 0.75f;
+	/*package*/static float RADIUS = 0;
 	
 	
 	
-	private final PointF mLocation;
+	private float mLocationX;
+	private float mLocationY;
 	private float mVectorX;
 	private float mVectorY;
-	private float mRadius;
 	
 	
 	
@@ -26,7 +26,8 @@ public class Ball {
 			Log.v(Ball.TAG, "> Ball()");
 		}
 		
-		this.mLocation = new PointF(0, 0);
+		this.mLocationX = 0;
+		this.mLocationY = 0;
 		this.mVectorX = 0;
 		this.mVectorY = 0;
 
@@ -37,20 +38,21 @@ public class Ball {
 	
 	
 	
-	public PointF getLocation() {
-		return this.mLocation;
+	public float getLocationX() {
+		return this.mLocationX;
+	}
+	
+	public float getLocationY() {
+		return this.mLocationY;
 	}
 	
 	public void setLocation(final float x, final float y) {
-		this.mLocation.set(x, y);
+		this.mLocationX = x;
+		this.mLocationY = y;
 		
 		if (Wallpaper.LOG_DEBUG) {
 			Log.d(Ball.TAG, "Location: (" + x + ", " + y + ")");
 		}
-	}
-	
-	public float getRadius() {
-		return this.mRadius;
 	}
 	
 	public float getVectorY() {
@@ -70,15 +72,7 @@ public class Ball {
 	}
 	
 	public void tick(final Game game) {
-		this.mLocation.x += this.mVectorX;
-		this.mLocation.y += this.mVectorY;
-	}
-	
-	public void performResize(final Game game) {
-		this.mRadius = ((game.getCellWidth() < game.getCellHeight()) ? game.getCellWidth() : game.getCellHeight()) * Ball.SIZE_PERCENTAGE;
-		
-		if (Wallpaper.LOG_DEBUG) {
-			Log.d(Ball.TAG, "Radius: " + this.mRadius);
-		}
+		this.mLocationX += this.mVectorX;
+		this.mLocationY += this.mVectorY;
 	}
 }

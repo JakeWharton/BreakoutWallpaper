@@ -451,7 +451,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		double closestDistance = Float.MAX_VALUE;
 		Ball closestBall = null;
 		for (final Ball ball : this.mBalls) {
-			final double ballDistance = Math.sqrt(Math.pow(ball.getLocation().x - x, 2) + Math.pow(ball.getLocation().y, 2));
+			final double ballDistance = Math.sqrt(Math.pow(ball.getLocationX() - x, 2) + Math.pow(ball.getLocationY(), 2));
 			if (ballDistance < closestDistance) {
 				closestBall = ball;
 				closestDistance = ballDistance;
@@ -459,8 +459,8 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		}
 		
 		//Normalize new direction
-		closestBall.setVectorX((float)(Math.abs(closestBall.getLocation().x - x) / closestDistance));
-		closestBall.setVectorY((float)(Math.abs(closestBall.getLocation().y - y) / closestDistance));
+		closestBall.setVectorX((float)(Math.abs(closestBall.getLocationX() - x) / closestDistance));
+		closestBall.setVectorY((float)(Math.abs(closestBall.getLocationY() - y) / closestDistance));
 	}
     
     /**
@@ -541,8 +541,8 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		ball.tick(this);
 
     		//Test screen edges
-    		final int ballCheckVertical = (int)((ball.getLocation().y + (Math.signum(ball.getVectorY()) * ball.getRadius())) / this.mCellHeight);
-    		final int ballCheckHorizontal = (int)((ball.getLocation().x + (Math.signum(ball.getVectorX()) * ball.getRadius())) / this.mCellWidth);
+    		final int ballCheckVertical = (int)((ball.getLocationY() + (Math.signum(ball.getVectorY()) * Ball.RADIUS)) / this.mCellHeight);
+    		final int ballCheckHorizontal = (int)((ball.getLocationX() + (Math.signum(ball.getVectorX()) * Ball.RADIUS)) / this.mCellWidth);
     		boolean doContinue = false;
     		if ((ballCheckVertical < 0) || (ballCheckVertical >= this.mCellsTall)) {
     			//reverse y vector
@@ -559,16 +559,15 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		}
     		
     		//Test blocks
-    		final int ballCheck1X = (int)((ball.getLocation().x - ball.getRadius()) / this.mCellWidth);
-    		final int ballCheck1Y = (int)((ball.getLocation().y + (Math.signum(ball.getVectorY()) * ball.getRadius())) / this.mCellHeight);
-    		final int ballCheck2X = (int)((ball.getLocation().x + ball.getRadius()) / this.mCellWidth);
+    		final int ballCheck1X = (int)((ball.getLocationX() - Ball.RADIUS) / this.mCellWidth);
+    		final int ballCheck1Y = (int)((ball.getLocationY() + (Math.signum(ball.getVectorY()) * Ball.RADIUS)) / this.mCellHeight);
+    		final int ballCheck2X = (int)((ball.getLocationX() + Ball.RADIUS) / this.mCellWidth);
     		final int ballCheck2Y = ballCheck1Y;
-    		final int ballCheck3X = (int)((ball.getLocation().x + (Math.signum(ball.getVectorX()) * ball.getRadius())) / this.mCellWidth);
-    		final int ballCheck3Y = (int)((ball.getLocation().y + (-Math.signum(ball.getVectorY()) * ball.getRadius())) / this.mCellHeight);
+    		final int ballCheck3X = (int)((ball.getLocationX() + (Math.signum(ball.getVectorX()) * Ball.RADIUS)) / this.mCellWidth);
+    		final int ballCheck3Y = (int)((ball.getLocationY() + (-Math.signum(ball.getVectorY()) * Ball.RADIUS)) / this.mCellHeight);
     		this.checkCollision(ball, ballCheck1X, ballCheck1Y);
     		this.checkCollision(ball, ballCheck2X, ballCheck2Y);
     		this.checkCollision(ball, ballCheck3X, ballCheck3Y);
-    		this.checkCollision(ball, ballCheck3X, (int)(ball.getLocation().y / this.mCellHeight));
     	}
     	
     	if (this.mBricksRemaining <= 0) {
@@ -587,8 +586,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	private boolean checkCollision(final Ball ball, final int blockX, final int blockY)
 	{
 		if (Wallpaper.LOG_DEBUG) {
-			Log.d(Game.TAG, "Checking: (" + blockX + "," + blockY + ")");
-			Log.d(Game.TAG, "Ball: (" + ball.getLocation().x + "," + ball.getLocation().y + ")");
+			Log.d(Game.TAG, "Checking block (" + blockX + "," + blockY + ") against ball at (" + ball.getLocationX() + "," + ball.getLocationY() + ")");
 		}
 		
 		if (!this.isBlock(blockX, blockY)) {
@@ -596,36 +594,16 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		}
 		
 		if (Wallpaper.LOG_DEBUG) {
-			Log.d(Game.TAG, "-- Is Block");
-		}
-		
-		final float cellWidthOverTwo = this.mCellWidth / 2.0f;
-		final float cellHeightOverTwo = this.mCellHeight / 2.0f;
-		final float circleR = ball.getRadius();
-		final float blockCenterX = (blockX * this.mCellWidth) + cellWidthOverTwo;
-		final float blockCenterY = (blockY * this.mCellHeight) + cellHeightOverTwo;
-		final float circleDistanceX = Math.abs(ball.getLocation().x - blockCenterX);
-		final float circleDistanceY = Math.abs(ball.getLocation().y - blockCenterY);
-		
-		if ((circleDistanceX > (cellWidthOverTwo + circleR)) || (circleDistanceY > (cellHeightOverTwo + circleR))) {
-			return false;
-		}
-		
-		final double circleDistanceSquared = Math.pow(circleDistanceX, 2) + Math.pow(circleDistanceY, 2);
-		final double maxDistanceSquared = Math.pow(cellWidthOverTwo, 2) + Math.pow(cellHeightOverTwo, 2) + Math.pow(circleR, 2);
-		if ((circleDistanceX > cellWidthOverTwo) && (circleDistanceY > cellHeightOverTwo) && (circleDistanceSquared > maxDistanceSquared)) {
-			return false;
-		}
-		
-		//If we're here, we collided
-		
-		if (Wallpaper.LOG_DEBUG) {
 			Log.d(Game.TAG, "-- Is Collision");
 			Log.d(Game.TAG, "-- Current Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
 		}
 		
-		float collisionUnitVectorX = ball.getLocation().x - blockCenterX;
-		float collisionUnitVectorY = ball.getLocation().y - blockCenterY;
+		final float cellWidthOverTwo = this.mCellWidth / 2.0f;
+		final float cellHeightOverTwo = this.mCellHeight / 2.0f;
+		final float blockCenterX = (blockX * this.mCellWidth) + cellWidthOverTwo;
+		final float blockCenterY = (blockY * this.mCellHeight) + cellHeightOverTwo;
+		float collisionUnitVectorX = ball.getLocationX() - blockCenterX;
+		float collisionUnitVectorY = ball.getLocationY() - blockCenterY;
 		final double collisionVectorLength = Math.sqrt(Math.pow(collisionUnitVectorX, 2) + Math.pow(collisionUnitVectorY, 2));
 		collisionUnitVectorX /= collisionVectorLength;
 		collisionUnitVectorY /= collisionVectorLength;
@@ -635,8 +613,8 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		final float ballUnitVectorY = (float)(ball.getVectorY() / ballVectorLength);
 		
 		final float dotProduct = (collisionUnitVectorX * ballUnitVectorX) + (collisionUnitVectorY * ballUnitVectorY);
-		final float vectorDeltaX = 2 * -collisionUnitVectorX * dotProduct;
-		final float vectorDeltaY = 2 * -collisionUnitVectorY * dotProduct;
+		final float vectorDeltaX = -2 * collisionUnitVectorX * dotProduct;
+		final float vectorDeltaY = -2 * collisionUnitVectorY * dotProduct;
 		
 		ball.setVectorX(ball.getVectorX() + vectorDeltaX);
 		ball.setVectorY(ball.getVectorY() + vectorDeltaY);
@@ -720,9 +698,8 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	this.mCellSize.right = this.mCellWidth;
     	this.mCellSize.bottom = this.mCellHeight;
     	
-    	for (final Ball ball : this.mBalls) {
-    		ball.performResize(this);
-    	}
+    	//Set ball radius
+    	Ball.RADIUS = ((this.mCellWidth < this.mCellHeight) ? this.mCellWidth : this.mCellHeight) * Ball.SIZE_PERCENTAGE / 2;
     	
     	//Position balls
     	//TODO: this should be in newGame();
@@ -751,6 +728,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		Log.d(Game.TAG, "Screen Height: " + screenHeight);
     		Log.d(Game.TAG, "Cell Width: " + this.mCellWidth);
     		Log.d(Game.TAG, "Cell Height: " + this.mCellHeight);
+    		Log.d(Game.TAG, "Ball Radius: " + Ball.RADIUS);
     	}
 
     	if (Wallpaper.LOG_VERBOSE) {
@@ -810,14 +788,14 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
         			final float right = left + this.mCellWidth;
         			final float bottom = top + this.mCellHeight;
         			
-        			c.drawRect(new RectF(left, top, right, bottom), this.mBlockForeground);
+        			c.drawRect(left, top, right, bottom, this.mBlockForeground);
         		}
         	}
         }
         
         //draw balls
         for (final Ball ball : this.mBalls) {
-        	c.drawCircle(ball.getLocation().x, ball.getLocation().y, ball.getRadius(), this.mBallForeground);
+        	c.drawRect(ball.getLocationX() - Ball.RADIUS, ball.getLocationY() - Ball.RADIUS, ball.getLocationX() + Ball.RADIUS, ball.getLocationY() + Ball.RADIUS, this.mBallForeground);
         }
     }
 }
