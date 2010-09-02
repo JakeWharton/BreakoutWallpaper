@@ -46,13 +46,13 @@
 			android:key="@string/settings_display_key"
 			android:title="@string/settings_display"
 			android:summary="@string/settings_display_summary">
-			<com.jakewharton.utilities.IntegerListPreference
+			<com.jakewharton.utilities.NumberPreference
 				android:key="@string/settings_display_fps_key"
 				android:title="@string/settings_display_fps"
 				android:summary="@string/settings_display_fps_summary"
 				android:defaultValue="@integer/display_fps_default"
-				android:entries="@array/fps"
-				android:entryValues="@array/fps_values"/>
+				app:min="@integer/display_fps_min"
+				app:max="@integer/display_fps_max"/>
 			<PreferenceCategory
 				android:title="@string/settings_display_layout">
 				<com.jakewharton.utilities.NumberPreference

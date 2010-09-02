@@ -451,7 +451,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	 * @param y Y coordinate of touch.
 	 */
 	public void setTouch(final float x, final float y) {
-		//XXX: broken
+		//XXX: semi-broken
 		double closestDistance = Float.MAX_VALUE;
 		Ball closestBall = null;
 		for (final Ball ball : this.mBalls) {
@@ -462,11 +462,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 			}
 		}
 		
-		//Normalize new direction
-		float newVectorX = (float)(Math.abs(closestBall.getLocationX() - x) / closestDistance);
-		float newVectorY = (float)(Math.abs(closestBall.getLocationY() - y) / closestDistance);
-		closestBall.setVectorX(newVectorX * Ball.SPEED);
-		closestBall.setVectorY(newVectorY * Ball.SPEED);
+		closestBall.setVector(Math.abs(closestBall.getLocationX() - x), Math.abs(closestBall.getLocationY() - y));
 	}
     
     /**
@@ -548,14 +544,14 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 
     		//Test screen edges
     		if (ball.getLocationX() <= 0) {
-    			ball.setVectorX(Math.abs(ball.getVectorX()));
+    			ball.setVector(Math.abs(ball.getVectorX()), ball.getVectorY());
     		} else if (ball.getLocationX() >= this.mGameWidth) {
-    			ball.setVectorX(-Math.abs(ball.getVectorX()));
+    			ball.setVector(-Math.abs(ball.getVectorX()), ball.getVectorY());
     		}
     		if (ball.getLocationY() <= 0) {
-    			ball.setVectorY(Math.abs(ball.getVectorY()));
+    			ball.setVector(ball.getVectorX(), Math.abs(ball.getVectorY()));
     		} else if (ball.getLocationY() >= this.mGameHeight) {
-    			ball.setVectorY(-Math.abs(ball.getVectorY()));
+    			ball.setVector(ball.getVectorX(), -Math.abs(ball.getVectorY()));
     		}
     		
     		//Test blocks
@@ -625,8 +621,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		newVectorX /= newVectorLength;
 		newVectorY /= newVectorLength;
 		
-		ball.setVectorX(newVectorX * Ball.SPEED);
-		ball.setVectorY(newVectorY * Ball.SPEED);
+		ball.setVector(newVectorX, newVectorY);
 		
 		if (Wallpaper.LOG_DEBUG) {
 			Log.d(Game.TAG, "-- New Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
@@ -718,21 +713,21 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	//TODO: this should be in newGame();
     	final PointF ball0Location = this.getBallLocationAtIcon(0, 0);
     	this.mBalls[0].setLocation(ball0Location.x, ball0Location.y);
-    	this.mBalls[0].setVectorY(-Ball.SPEED);
+    	this.mBalls[0].setVector(0, -1);
     	if (this.mBalls.length > 1) {
     		final PointF ball1Location = this.getBallLocationAtIcon(this.mIconCols - 1, this.mIconRows - 1);
     		this.mBalls[1].setLocation(ball1Location.x, ball1Location.y);
-        	this.mBalls[1].setVectorY(Ball.SPEED);
+        	this.mBalls[1].setVector(0, 1);
     	}
     	if (this.mBalls.length > 2) {
     		final PointF ball2Location = this.getBallLocationAtIcon(this.mIconCols - 1, 0);
     		this.mBalls[2].setLocation(ball2Location.x, ball2Location.y);
-        	this.mBalls[2].setVectorX(Ball.SPEED);
+        	this.mBalls[2].setVector(1, 0);
     	}
     	if (this.mBalls.length > 3) {
     		final PointF ball3Location = this.getBallLocationAtIcon(0, this.mIconRows - 1);
     		this.mBalls[3].setLocation(ball3Location.x, ball3Location.y);
-        	this.mBalls[3].setVectorX(-Ball.SPEED);
+        	this.mBalls[3].setVector(-1, 0);
     	}
     	
     	if (Wallpaper.LOG_DEBUG) {

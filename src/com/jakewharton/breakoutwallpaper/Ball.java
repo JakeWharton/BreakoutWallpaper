@@ -11,7 +11,7 @@ public class Ball {
 	private static final String TAG = "BreakoutWallpaper.Ball";
 	/*package*/static final float SIZE_PERCENTAGE = 0.75f;
 	/*package*/static float RADIUS = 0;
-	/*package*/static final int SPEED = 5;
+	/*package*/static final int SPEED = 10;
 	
 	
 	
@@ -64,11 +64,14 @@ public class Ball {
 		return this.mVectorY;
 	}
 	
-	public void setVectorX(final float x) {
+	public void setVector(float x, float y) {
+		final float length = (float)Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+		x /= length;
+		y /= length;
+		x *= Ball.SPEED;
+		y *= Ball.SPEED;
+		
 		this.mVectorX = x;
-	}
-	
-	public void setVectorY(final float y) {
 		this.mVectorY = y;
 	}
 	
