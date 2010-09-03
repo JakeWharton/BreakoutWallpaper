@@ -48,8 +48,14 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	 */
 	private static final int CELLS_BETWEEN_COLUMN = 1;
 	
+	/**
+	 * Paint solid shapes.
+	 */
 	private static final int PAINT_STYLE_FILL = 0;
 	
+	/**
+	 * Paint shape outlines.
+	 */
 	private static final int PAINT_STYLE_STROKE = 1;
 	
 	/**
