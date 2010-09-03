@@ -603,18 +603,17 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	 * @param y Y coordinate of touch.
 	 */
 	public void setTouch(final float x, final float y) {
-		//XXX: semi-broken
 		double closestDistance = Float.MAX_VALUE;
 		Ball closestBall = null;
 		for (final Ball ball : this.mBalls) {
-			final double ballDistance = Math.sqrt(Math.pow(ball.getLocationX() - x, 2) + Math.pow(ball.getLocationY() - y, 2));
+			final double ballDistance = Math.sqrt(Math.pow(x - ball.getLocationX(), 2) + Math.pow(y - ball.getLocationY(), 2));
 			if (ballDistance < closestDistance) {
 				closestBall = ball;
 				closestDistance = ballDistance;
 			}
 		}
 		
-		closestBall.setVector(Math.abs(closestBall.getLocationX() - x), Math.abs(closestBall.getLocationY() - y));
+		closestBall.setVector(x - closestBall.getLocationX(), y - closestBall.getLocationY());
 	}
     
     /**
