@@ -688,6 +688,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		this.checkCollision(ball, ballCheck2X, ballCheck2Y);
     		this.checkCollision(ball, ballCheck3X, ballCheck3Y);
     		
+    		//Check game mode
     		switch (this.mMode) {
     			case Game.MODE_ENDLESS:
     				Log.d(Game.TAG, "Remaining: " + this.mBlocksRemaining + ", Total: " + this.mBlocksTotal + ", Factor: " + this.mRegenPercent + ", Regen: " + (this.mBlocksTotal * this.mRegenPercent));
