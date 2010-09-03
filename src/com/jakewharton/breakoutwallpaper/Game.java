@@ -892,7 +892,6 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	Ball.RADIUS = ((this.mCellWidth < this.mCellHeight) ? this.mCellWidth : this.mCellHeight) * Ball.SIZE_PERCENTAGE / 2;
     	
     	//Position balls
-    	//TODO: this should be in newGame();
     	final PointF ball0Location = this.getBallLocationAtIcon(0, 0);
     	this.mBalls[0].setLocation(ball0Location.x, ball0Location.y);
     	this.mBalls[0].setVector(0, -1);
