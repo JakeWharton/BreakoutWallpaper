@@ -692,7 +692,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
      */
     public void tick() {
     	for (final Ball ball : this.mBalls) {
-    		ball.tick(this);
+    		ball.tick();
 
     		//Test screen edges
     		if (ball.getLocationX() <= 0) {
