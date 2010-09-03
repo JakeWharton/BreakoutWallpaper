@@ -60,7 +60,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	/**
 	 * Endless mode.
 	 */
-	private static final int MODE_ENDLESS = 0;
+	/*package*/static final int MODE_ENDLESS = 0;
 	
 	/**
 	 * Level mode.

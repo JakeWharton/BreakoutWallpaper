@@ -331,6 +331,13 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
 		final boolean all = (key == null);
 		final Resources resources = this.getResources();
 		
+		//Only enabled endless regen percentage when on endless game mode
+		final String gameMode = resources.getString(R.string.settings_game_mode_key);
+		if (all || key.equals(gameMode)) {
+			final boolean enabled = (preferences.getInt(gameMode, resources.getInteger(R.integer.game_mode_default)) == Game.MODE_ENDLESS);
+			this.findPreference(resources.getString(R.string.settings_game_endlessregen_key)).setEnabled(enabled);
+		}
+		
 		//Only enable clear bg image when a bg image is set
 		final String bgimage = resources.getString(R.string.settings_color_bgimage_key);
 		if (all || key.equals(bgimage)) {
