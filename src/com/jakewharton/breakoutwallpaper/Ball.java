@@ -106,21 +106,21 @@ public class Ball {
 	}
 	
 	/**
-	 * Get Y coordinate of per-tick movement vector.
-	 * 
-	 * @return Float.
-	 */
-	public float getVectorY() {
-		return this.mVectorX;
-	}
-	
-	/**
 	 * Get X coordinate of per-tick movement vector.
 	 * 
 	 * @return Float.
 	 */
 	public float getVectorX() {
 		return this.mVectorY;
+	}
+	
+	/**
+	 * Get Y coordinate of per-tick movement vector.
+	 * 
+	 * @return Float.
+	 */
+	public float getVectorY() {
+		return this.mVectorX;
 	}
 	
 	/**
