@@ -34,18 +34,33 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	private static final int CELL_BLANK = 0;
 	
 	/**
-	 * Brick cells between icon rows.
+	 * Cell value for an invalid space.
+	 */
+	private static final int CELL_INVALID = 1;
+	
+	/**
+	 * Block cells between icon rows.
 	 */
 	private static final int CELLS_BETWEEN_ROW = 2;
 	
 	/**
-	 * Brick cells between icon columns.
+	 * Block cells between icon columns.
 	 */
 	private static final int CELLS_BETWEEN_COLUMN = 1;
 	
 	private static final int PAINT_STYLE_FILL = 0;
 	
 	private static final int PAINT_STYLE_STROKE = 1;
+	
+	/**
+	 * Endless mode.
+	 */
+	private static final int MODE_ENDLESS = 0;
+	
+	/**
+	 * Level mode.
+	 */
+	private static final int MODE_LEVELS = 1;
 	
 
 	
@@ -167,7 +182,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     private final Paint mBackgroundPaint;
     
     /**
-     * Paint to draw the bricks.
+     * Paint to draw the blocks.
      */
     private final Paint mBlockForeground;
     
@@ -182,14 +197,29 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     private Ball[] mBalls;
     
     /**
-     * Colors for bricks.
+     * Colors for blocks.
      */
-    private final LinkedList<Integer> mBrickColors;
+    private final LinkedList<Integer> mBlockColors;
     
     /**
-     * Number of bricks remaining in the game.
+     * Number of blocks remaining in the game.
      */
-    private int mBricksRemaining;
+    private int mBlocksRemaining;
+    
+    /**
+     * Total blocks in a level.
+     */
+    private int mBlocksTotal;
+    
+    /**
+     * Gameplay mode.
+     */
+    private int mMode;
+    
+    /**
+     * Percentage at which to regenerate blocks.
+     */
+    private float mRegenPercent;
     
     
     
@@ -210,10 +240,10 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
         
         this.mCellSize = new RectF(0, 0, 0, 0);
         
-        this.mBrickColors = new LinkedList<Integer>();
-        this.mBrickColors.add(0xffff0000);
-        this.mBrickColors.add(0xff00ff00);
-        this.mBrickColors.add(0xff0000ff);
+        this.mBlockColors = new LinkedList<Integer>();
+        this.mBlockColors.add(0xffff0000);
+        this.mBlockColors.add(0xff00ff00);
+        this.mBlockColors.add(0xff0000ff);
         
         //Load all preferences or their defaults
         Wallpaper.PREFERENCES.registerOnSharedPreferenceChangeListener(this);
@@ -258,6 +288,25 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	    	for (int i = 0; i < balls; i++) {
 	    		this.mBalls[i] = new Ball();
 	    	}
+        }
+        
+        final String gameMode = resources.getString(R.string.settings_game_mode_key);
+        if (all || key.equals(gameMode)) {
+        	this.mMode = preferences.getInt(gameMode, resources.getInteger(R.integer.game_mode_default));
+        	
+        	if (Wallpaper.LOG_DEBUG) {
+        		Log.d(Game.TAG, "Game Mode: " + this.mMode);
+        	}
+        }
+        
+        final String endlessRegen = resources.getString(R.string.settings_game_endlessregen_key);
+        if (all || key.equals(endlessRegen)) {
+        	final int regen = preferences.getInt(endlessRegen, resources.getInteger(R.integer.game_endlessregen_default));
+        	this.mRegenPercent = regen / 100.0f;
+        	
+        	if (Wallpaper.LOG_DEBUG) {
+        		Log.d(Game.TAG, "Endless Regen: " + regen + "%");
+        	}
         }
 		
 		
@@ -461,7 +510,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 				this.performResize(this.mScreenWidth, this.mScreenHeight);
 			}
 
-	    	this.newGame();
+	    	this.newLevel();
 		}
 
     	if (Wallpaper.LOG_VERBOSE) {
@@ -488,6 +537,19 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	}
 	
 	/**
+	 * Determine whether or not a position is a valid cell.
+	 * 
+	 * @param x X coordinate.
+	 * @param y Y coordinate.
+	 * @return Boolean.
+	 */
+	private boolean isCell(final int x, final int y) {
+		return (x >= 0) && (x < this.mCellsWide)
+			&& (y >= 0) && (y < this.mCellsTall)
+			&& (this.mBoard[y][x] != Game.CELL_INVALID);
+	}
+	
+	/**
 	 * Determine whether or not a position contains a block.
 	 * 
 	 * @param x X coordinate.
@@ -495,7 +557,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 	 * @return Boolean.
 	 */
 	private boolean isBlock(final int x, final int y) {
-		return ((x >= 0) && (x < this.mCellsWide) && (y >= 0) && (y < this.mCellsTall) && (this.mBoard[y][x] != Game.CELL_BLANK));
+		return this.isCell(x, y) && (this.mBoard[y][x] != Game.CELL_BLANK);
 	}
 	
 	/**
@@ -522,7 +584,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     /**
      * Reset the game state to that of first initialization.
      */
-    public void newGame() {
+    public void newLevel() {
     	if (Wallpaper.LOG_VERBOSE) {
     		Log.v(Game.TAG, "> newGame()");
     	}
@@ -530,15 +592,15 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	//Initialize board
     	final int iconCellsWidth = this.mCellColumnSpacing + Game.CELLS_BETWEEN_COLUMN;
     	final int iconCellsHeight = this.mCellRowSpacing + Game.CELLS_BETWEEN_ROW;
-    	final int colors = this.mBrickColors.size();
+    	final int colors = this.mBlockColors.size();
     	for (int y = 0; y < this.mCellsTall; y++) {
     		for (int x = 0; x < this.mCellsWide; x++) {
     			final int dx = x % iconCellsWidth;
     			final int dy = y % iconCellsHeight;
     			if ((dx < Game.CELLS_BETWEEN_COLUMN) || (dy < Game.CELLS_BETWEEN_ROW)) {
-    				this.mBoard[y][x] = this.mBrickColors.get((x + y) % colors);
+    				this.mBoard[y][x] = this.mBlockColors.get((x + y) % colors);
     			} else {
-    				this.mBoard[y][x] = Game.CELL_BLANK;
+    				this.mBoard[y][x] = Game.CELL_INVALID;
     			}
     		}
     	}
@@ -555,20 +617,21 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		final int right = (widget.right * iconCellsWidth) + Game.CELLS_BETWEEN_COLUMN + this.mCellColumnSpacing - 1;
     		for (int y = top; y <= bottom; y++) {
     			for (int x = left; x <= right; x++) {
-    				this.mBoard[y][x] = Game.CELL_BLANK;
+    				this.mBoard[y][x] = Game.CELL_INVALID;
     			}
     		}
     	}
     	
-    	//Count bricks
-    	this.mBricksRemaining = 0;
+    	//Count blocks
+    	this.mBlocksRemaining = 0;
     	for (int y = 0; y < this.mCellsTall; y++) {
     		for (int x = 0; x < this.mCellsWide; x++) {
-    			if (this.mBoard[y][x] != Game.CELL_BLANK) {
-    				this.mBricksRemaining += 1;
+    			if ((this.mBoard[y][x] != Game.CELL_BLANK) && (this.mBoard[y][x] != Game.CELL_INVALID)) {
+    				this.mBlocksRemaining += 1;
     			}
     		}
     	}
+    	this.mBlocksTotal = this.mBlocksRemaining;
     	
     	if (Wallpaper.LOG_VERBOSE) {
     		Log.v(Game.TAG, "< newGame()");
@@ -598,14 +661,14 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 
     		//Test screen edges
     		if (ball.getLocationX() <= 0) {
-    			ball.setVector(Math.abs(ball.getVectorX()), ball.getVectorY());
+    			ball.setVector(Math.abs(ball.getVectorX()), ball.getVectorY() + Game.RANDOM.nextFloat());
     		} else if (ball.getLocationX() >= this.mGameWidth) {
-    			ball.setVector(-Math.abs(ball.getVectorX()), ball.getVectorY());
+    			ball.setVector(-Math.abs(ball.getVectorX()), ball.getVectorY() + Game.RANDOM.nextFloat());
     		}
     		if (ball.getLocationY() <= 0) {
-    			ball.setVector(ball.getVectorX(), Math.abs(ball.getVectorY()));
+    			ball.setVector(ball.getVectorX() + Game.RANDOM.nextFloat(), Math.abs(ball.getVectorY()));
     		} else if (ball.getLocationY() >= this.mGameHeight) {
-    			ball.setVector(ball.getVectorX(), -Math.abs(ball.getVectorY()));
+    			ball.setVector(ball.getVectorX() + Game.RANDOM.nextFloat(), -Math.abs(ball.getVectorY()));
     		}
     		
     		//Test blocks
@@ -618,24 +681,53 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		this.checkCollision(ball, ballCheck1X, ballCheck1Y);
     		this.checkCollision(ball, ballCheck2X, ballCheck2Y);
     		this.checkCollision(ball, ballCheck3X, ballCheck3Y);
+    		
+    		switch (this.mMode) {
+    			case Game.MODE_ENDLESS:
+    				Log.d(Game.TAG, "Remaining: " + this.mBlocksRemaining + ", Total: " + this.mBlocksTotal + ", Factor: " + this.mRegenPercent + ", Regen: " + (this.mBlocksTotal * this.mRegenPercent));
+    				if (this.mBlocksRemaining < (this.mBlocksTotal * this.mRegenPercent)) {
+    					Log.d(Game.TAG, "Regen");
+    					while (true) {
+    						final int x = Game.RANDOM.nextInt(this.mCellsWide);
+    						final int y = Game.RANDOM.nextInt(this.mCellsTall);
+    						
+    						if (this.isCell(x, y) && (this.mBoard[y][x] == Game.CELL_BLANK)) {
+    							this.mBoard[y][x] = this.mBlockColors.get((x + y) % this.mBlockColors.size());
+    							break;
+    						}
+    					}
+    					this.mBlocksRemaining += 1;
+    				}
+    				break;
+    				
+    			case Game.MODE_LEVELS:
+    				if (this.mBlocksRemaining == 0) {
+    					this.newLevel();
+    				}
+    				break;
+    				
+    			default:
+    				Log.e(Game.TAG, "Invalid game mode value " + this.mMode);
+    				break;
+    		}
     	}
     	
-    	if (this.mBricksRemaining <= 0) {
-    		this.newGame();
+    	if (this.mBlocksRemaining <= 0) {
+    		this.newLevel();
     	}
     }
     
     /**
-     * Determine if a ball has collided with a brick in the specified coordinates.
+     * Determine if a ball has collided with a block in the specified coordinates.
      * 
      * @param ball Ball instance.
-     * @param blockX X coordinate of potential brick.
-     * @param blockY Y coordinate of potential brick.
+     * @param blockX X coordinate of potential block.
+     * @param blockY Y coordinate of potential block.
      * @return Boolean indicating collision.
      */
 	private boolean checkCollision(final Ball ball, final int blockX, final int blockY)
 	{
-		if (Wallpaper.LOG_DEBUG) {
+		if (Wallpaper.LOG_VERBOSE) {
 			Log.d(Game.TAG, "Checking block (" + blockX + "," + blockY + ") against ball at (" + ball.getLocationX() + "," + ball.getLocationY() + ")");
 		}
 		
@@ -643,7 +735,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 			return false;
 		}
 		
-		if (Wallpaper.LOG_DEBUG) {
+		if (Wallpaper.LOG_VERBOSE) {
 			Log.d(Game.TAG, "-- Is Collision");
 			Log.d(Game.TAG, "-- Current Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
 		}
@@ -677,12 +769,12 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 		
 		ball.setVector(newVectorX, newVectorY);
 		
-		if (Wallpaper.LOG_DEBUG) {
+		if (Wallpaper.LOG_VERBOSE) {
 			Log.d(Game.TAG, "-- New Vector: (" + ball.getVectorX() + "," + ball.getVectorY() + ")");
 		}
-		
+
 		this.mBoard[blockY][blockX] = Game.CELL_BLANK;
-		this.mBricksRemaining -= 1;
+		this.mBlocksRemaining -= 1;
 		
 		return true;
 	}
@@ -842,7 +934,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
         for (int y = 0; y < this.mCellsTall; y++) {
         	for (int x = 0; x < this.mCellsWide; x++) {
         		final int cell = this.mBoard[y][x];
-        		if (cell != Game.CELL_BLANK) {
+        		if ((cell != Game.CELL_BLANK) && (cell != Game.CELL_INVALID)) {
         			this.mBlockForeground.setColor(cell);
         			
         			final float left = x * this.mCellWidth;

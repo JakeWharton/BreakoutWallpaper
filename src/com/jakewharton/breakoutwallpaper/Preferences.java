@@ -462,8 +462,14 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
         final Resources resources = this.getResources();
 	    final SharedPreferences.Editor editor = Preferences.this.getPreferenceManager().getSharedPreferences().edit();
 
+	    //game mode
+	    editor.putInt(resources.getString(R.string.settings_game_mode_key), resources.getInteger(R.integer.game_mode_default));
+	    //endless regen
+	    editor.putInt(resources.getString(R.string.settings_game_endlessregen_key), resources.getInteger(R.integer.game_endlessregen_default));
 		//user controllable
 		editor.putBoolean(resources.getString(R.string.settings_game_usercontrol_key), resources.getBoolean(R.bool.game_usercontrol_default));
+		//ball count
+		editor.putInt(resources.getString(R.string.settings_game_ballcount_key), resources.getInteger(R.integer.game_ballcount_default));
 		
 		editor.commit();
     }

@@ -5,6 +5,12 @@
     <integer name="version_code_default">0</integer>
     
     
+    <integer name="game_mode_default">0</integer>
+    
+    <integer name="game_endlessregen_default">50</integer>
+    <integer name="game_endlessregen_min">25</integer>
+    <integer name="game_endlessregen_max">75</integer>
+    
     <integer name="game_ballcount_default">4</integer>
     <integer name="game_ballcount_min">1</integer>
     <integer name="game_ballcount_max">4</integer>

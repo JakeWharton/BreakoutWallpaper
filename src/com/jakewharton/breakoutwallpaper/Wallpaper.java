@@ -29,7 +29,7 @@ public class Wallpaper extends WallpaperService {
 	/**
 	 * Whether or not we are logging in debug mode.
 	 */
-	/*package*/static final boolean LOG_DEBUG = false;
+	/*package*/static final boolean LOG_DEBUG = true;
 	
 	/**
 	 * Whether or not we are logging in verbose mode.
@@ -265,7 +265,7 @@ public class Wallpaper extends WallpaperService {
         	if (event.getAction() == MotionEvent.ACTION_DOWN) {
         		final long touch = System.currentTimeMillis();
         		if (touch - this.mLastTouch < BreakEngine.RESET_THRESHOLD) {
-        			this.mGame.newGame();
+        			this.mGame.newLevel();
         			this.mLastTouch = 0;
         		} else if (this.mIsControllable) {
 	        		this.mLastTouch = touch;
