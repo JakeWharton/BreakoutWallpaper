@@ -53,7 +53,7 @@
 	<integer name="display_colspacing_max">6</integer>
 	
 	
-	<integer name="color_background_default">0xff424242</integer>
+	<integer name="color_background_default">0xff3d3d3d</integer>
 	<integer name="color_bgopacity_default">0xff</integer>
 	<integer name="color_bgopacity_min">0x00</integer>
 	<integer name="color_bgopacity_max">0xff</integer>

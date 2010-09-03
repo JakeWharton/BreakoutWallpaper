@@ -242,14 +242,14 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
         this.mBlockForeground = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.mBallForeground = new Paint(Paint.ANTI_ALIAS_FLAG);
         //TODO: make preference
-        this.mBallForeground.setColor(0xffffffff);
+        this.mBallForeground.setColor(0xffecece2);
         
         this.mCellSize = new RectF(0, 0, 0, 0);
         
         this.mBlockColors = new LinkedList<Integer>();
-        this.mBlockColors.add(0xffff0000);
-        this.mBlockColors.add(0xff00ff00);
-        this.mBlockColors.add(0xff0000ff);
+        this.mBlockColors.add(0xffb55757);
+        this.mBlockColors.add(0xff76b865);
+        this.mBlockColors.add(0xff6a7bd4);
         
         //Load all preferences or their defaults
         Wallpaper.PREFERENCES.registerOnSharedPreferenceChangeListener(this);
