@@ -1,7 +1,6 @@
 package com.jakewharton.breakoutwallpaper;
 
 import java.io.FileNotFoundException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import com.jakewharton.utilities.WidgetLocationsPreference;
@@ -205,7 +204,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     /**
      * Colors for blocks.
      */
-    private final LinkedList<Integer> mBlockColors;
+    private final int[] mBlockColors;
     
     /**
      * Number of blocks remaining in the game.
@@ -241,15 +240,10 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
         this.mBackgroundPaint = new Paint();
         this.mBlockForeground = new Paint(Paint.ANTI_ALIAS_FLAG);
         this.mBallForeground = new Paint(Paint.ANTI_ALIAS_FLAG);
-        //TODO: make preference
-        this.mBallForeground.setColor(0xffecece2);
         
         this.mCellSize = new RectF(0, 0, 0, 0);
         
-        this.mBlockColors = new LinkedList<Integer>();
-        this.mBlockColors.add(0xffb55757);
-        this.mBlockColors.add(0xff76b865);
-        this.mBlockColors.add(0xff6a7bd4);
+        this.mBlockColors = new int[3];
         
         //Load all preferences or their defaults
         Wallpaper.PREFERENCES.registerOnSharedPreferenceChangeListener(this);
@@ -349,6 +343,42 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 			
 			if (Wallpaper.LOG_DEBUG) {
 				Log.d(Game.TAG, "Background Image Opacity: " + this.mBackgroundPaint.getAlpha());
+			}
+		}
+		
+		final String ballColor = resources.getString(R.string.settings_color_ball_key);
+		if (all || key.equals(ballColor)) {
+			this.mBallForeground.setColor(preferences.getInt(ballColor, resources.getInteger(R.integer.color_ball_default)));
+			
+			if (Wallpaper.LOG_DEBUG) {
+				Log.d(Game.TAG, "Ball Color: #" + Integer.toHexString(this.mBallForeground.getColor()));
+			}
+		}
+		
+		final String block1Color = resources.getString(R.string.settings_color_block1_key);
+		if (all || key.equals(block1Color)) {
+			this.mBlockColors[0] = preferences.getInt(block1Color, resources.getInteger(R.integer.color_block1_default));
+			
+			if (Wallpaper.LOG_DEBUG) {
+				Log.d(Game.TAG, "Block 1 Color: #" + Integer.toHexString(this.mBlockColors[0]));
+			}
+		}
+		
+		final String block2Color = resources.getString(R.string.settings_color_block2_key);
+		if (all || key.equals(block2Color)) {
+			this.mBlockColors[1] = preferences.getInt(block2Color, resources.getInteger(R.integer.color_block2_default));
+			
+			if (Wallpaper.LOG_DEBUG) {
+				Log.d(Game.TAG, "Block 2 Color: #" + Integer.toHexString(this.mBlockColors[1]));
+			}
+		}
+		
+		final String block3Color = resources.getString(R.string.settings_color_block3_key);
+		if (all || key.equals(block3Color)) {
+			this.mBlockColors[2] = preferences.getInt(block3Color, resources.getInteger(R.integer.color_block3_default));
+			
+			if (Wallpaper.LOG_DEBUG) {
+				Log.d(Game.TAG, "Block 3 Color: #" + Integer.toHexString(this.mBlockColors[2]));
 			}
 		}
 		
@@ -598,13 +628,13 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     	//Initialize board
     	final int iconCellsWidth = this.mCellColumnSpacing + Game.CELLS_BETWEEN_COLUMN;
     	final int iconCellsHeight = this.mCellRowSpacing + Game.CELLS_BETWEEN_ROW;
-    	final int colors = this.mBlockColors.size();
+    	final int colors = this.mBlockColors.length;
     	for (int y = 0; y < this.mCellsTall; y++) {
     		for (int x = 0; x < this.mCellsWide; x++) {
     			final int dx = x % iconCellsWidth;
     			final int dy = y % iconCellsHeight;
     			if ((dx < Game.CELLS_BETWEEN_COLUMN) || (dy < Game.CELLS_BETWEEN_ROW)) {
-    				this.mBoard[y][x] = this.mBlockColors.get((x + y) % colors);
+    				this.mBoard[y][x] = this.mBlockColors[(x + y) % colors];
     			} else {
     				this.mBoard[y][x] = Game.CELL_INVALID;
     			}
@@ -699,7 +729,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     						final int y = Game.RANDOM.nextInt(this.mCellsTall);
     						
     						if (this.isCell(x, y) && (this.mBoard[y][x] == Game.CELL_BLANK)) {
-    							this.mBoard[y][x] = this.mBlockColors.get((x + y) % this.mBlockColors.size());
+    							this.mBoard[y][x] = this.mBlockColors[(x + y) % this.mBlockColors.length];
     							break;
     						}
     					}

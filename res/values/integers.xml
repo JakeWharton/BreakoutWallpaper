@@ -57,6 +57,10 @@
 	<integer name="color_bgopacity_default">0xff</integer>
 	<integer name="color_bgopacity_min">0x00</integer>
 	<integer name="color_bgopacity_max">0xff</integer>
+	<integer name="color_ball_default">0xffecece2</integer>
+	<integer name="color_block1_default">0xffb55757</integer>
+	<integer name="color_block2_default">0xff76b865</integer>
+	<integer name="color_block3_default">0xff6a7bd4</integer>
 	<integer name="color_blockstyle_default">0</integer>
 	<integer name="color_ballstyle_default">0</integer>
 </resources>

@@ -179,6 +179,34 @@
 			</PreferenceCategory>
 			
 			<PreferenceCategory
+				android:title="@string/settings_color_ball_header">
+				<com.jakewharton.utilities.ColorPreference
+					android:key="@string/settings_color_ball_key"
+					android:title="@string/settings_color_ball"
+					android:summary="@string/settings_color_ball_summary"
+					android:defaultValue="@integer/color_ball_default"/>
+			</PreferenceCategory>
+			
+			<PreferenceCategory
+				android:title="@string/settings_color_blocks_header">
+				<com.jakewharton.utilities.ColorPreference
+					android:key="@string/settings_color_block1_key"
+					android:title="@string/settings_color_block1"
+					android:summary="@string/settings_color_block1_summary"
+					android:defaultValue="@integer/color_block1_default"/>
+				<com.jakewharton.utilities.ColorPreference
+					android:key="@string/settings_color_block2_key"
+					android:title="@string/settings_color_block2"
+					android:summary="@string/settings_color_block2_summary"
+					android:defaultValue="@integer/color_block2_default"/>
+				<com.jakewharton.utilities.ColorPreference
+					android:key="@string/settings_color_block3_key"
+					android:title="@string/settings_color_block3"
+					android:summary="@string/settings_color_block3_summary"
+					android:defaultValue="@integer/color_block3_default"/>
+			</PreferenceCategory>
+			
+			<PreferenceCategory
 				android:title="@string/settings_color_style_header">
 				<com.jakewharton.utilities.IntegerListPreference
 					android:key="@string/settings_color_blockstyle_key"
