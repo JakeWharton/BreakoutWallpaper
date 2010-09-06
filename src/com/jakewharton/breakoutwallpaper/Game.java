@@ -720,9 +720,7 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		//Check game mode
     		switch (this.mMode) {
     			case Game.MODE_ENDLESS:
-    				Log.d(Game.TAG, "Remaining: " + this.mBlocksRemaining + ", Total: " + this.mBlocksTotal + ", Factor: " + this.mRegenPercent + ", Regen: " + (this.mBlocksTotal * this.mRegenPercent));
     				if (this.mBlocksRemaining < (this.mBlocksTotal * this.mRegenPercent)) {
-    					Log.d(Game.TAG, "Regen");
     					while (true) {
     						final int x = Game.RANDOM.nextInt(this.mCellsWide);
     						final int y = Game.RANDOM.nextInt(this.mCellsTall);
