@@ -470,13 +470,13 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
 	    final SharedPreferences.Editor editor = Preferences.this.getPreferenceManager().getSharedPreferences().edit();
 
 	    //game mode
-	    editor.putInt(resources.getString(R.string.settings_game_mode_key), resources.getInteger(R.integer.game_mode_default));
+	    editor.remove(resources.getString(R.string.settings_game_mode_key));
 	    //endless regen
-	    editor.putInt(resources.getString(R.string.settings_game_endlessregen_key), resources.getInteger(R.integer.game_endlessregen_default));
+	    editor.remove(resources.getString(R.string.settings_game_endlessregen_key));
 		//user controllable
-		editor.putBoolean(resources.getString(R.string.settings_game_usercontrol_key), resources.getBoolean(R.bool.game_usercontrol_default));
+		editor.remove(resources.getString(R.string.settings_game_usercontrol_key));
 		//ball count
-		editor.putInt(resources.getString(R.string.settings_game_ballcount_key), resources.getInteger(R.integer.game_ballcount_default));
+		editor.remove(resources.getString(R.string.settings_game_ballcount_key));
 		
 		editor.commit();
     }
@@ -489,25 +489,25 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
 	    final SharedPreferences.Editor editor = Preferences.this.getPreferenceManager().getSharedPreferences().edit();
 
 		//fps
-		editor.putInt(resources.getString(R.string.settings_display_fps_key), resources.getInteger(R.integer.display_fps_default));
+		editor.remove(resources.getString(R.string.settings_display_fps_key));
 		//icon rows
-		editor.putInt(resources.getString(R.string.settings_display_iconrows_key), resources.getInteger(R.integer.display_iconrows_default));
+		editor.remove(resources.getString(R.string.settings_display_iconrows_key));
 		//icon cols
-		editor.putInt(resources.getString(R.string.settings_display_iconcols_key), resources.getInteger(R.integer.display_iconcols_default));
+		editor.remove(resources.getString(R.string.settings_display_iconcols_key));
 		//icon row spacing
-		editor.putInt(resources.getString(R.string.settings_display_rowspacing_key), resources.getInteger(R.integer.display_rowspacing_default));
+		editor.remove(resources.getString(R.string.settings_display_rowspacing_key));
 		//icon col spacing
-		editor.putInt(resources.getString(R.string.settings_display_colspacing_key), resources.getInteger(R.integer.display_colspacing_default));
+		editor.remove(resources.getString(R.string.settings_display_colspacing_key));
 		//widget locations
-		editor.putString(resources.getString(R.string.settings_display_widgetlocations_key), resources.getString(R.string.display_widgetlocations_default));
+		editor.remove(resources.getString(R.string.settings_display_widgetlocations_key));
 		//padding top
-		editor.putInt(resources.getString(R.string.settings_display_padding_top_key), resources.getInteger(R.integer.display_padding_top_default));
+		editor.remove(resources.getString(R.string.settings_display_padding_top_key));
 		//padding bottom
-		editor.putInt(resources.getString(R.string.settings_display_padding_bottom_key), resources.getInteger(R.integer.display_padding_bottom_default));
+		editor.remove(resources.getString(R.string.settings_display_padding_bottom_key));
 		//padding left
-		editor.putInt(resources.getString(R.string.settings_display_padding_left_key), resources.getInteger(R.integer.display_padding_left_default));
+		editor.remove(resources.getString(R.string.settings_display_padding_left_key));
 		//padding right
-		editor.putInt(resources.getString(R.string.settings_display_padding_right_key), resources.getInteger(R.integer.display_padding_right_default));
+		editor.remove(resources.getString(R.string.settings_display_padding_right_key));
 	
 		editor.commit();
     }
@@ -520,23 +520,23 @@ public class Preferences extends PreferenceActivity implements SharedPreferences
 		final SharedPreferences.Editor editor = Preferences.this.getPreferenceManager().getSharedPreferences().edit();
 
 		//background
-		editor.putInt(resources.getString(R.string.settings_color_background_key), resources.getInteger(R.integer.color_background_default));
+		editor.remove(resources.getString(R.string.settings_color_background_key));
 		//background image
-		editor.putString(resources.getString(R.string.settings_color_bgimage_key), null);
+		editor.remove(resources.getString(R.string.settings_color_bgimage_key));
 		//background opacity
-		editor.putInt(resources.getString(R.string.settings_color_bgopacity_key), resources.getInteger(R.integer.color_bgopacity_default));
+		editor.remove(resources.getString(R.string.settings_color_bgopacity_key));
 		//ball color
-		editor.putInt(resources.getString(R.string.settings_color_ball_key), resources.getInteger(R.integer.color_ball_default));
+		editor.remove(resources.getString(R.string.settings_color_ball_key));
 		//block 1 color
-		editor.putInt(resources.getString(R.string.settings_color_block1_key), resources.getInteger(R.integer.color_block1_default));
+		editor.remove(resources.getString(R.string.settings_color_block1_key));
 		//block 2 color
-		editor.putInt(resources.getString(R.string.settings_color_block2_key), resources.getInteger(R.integer.color_block2_default));
+		editor.remove(resources.getString(R.string.settings_color_block2_key));
 		//block 3 color
-		editor.putInt(resources.getString(R.string.settings_color_block3_key), resources.getInteger(R.integer.color_block3_default));
+		editor.remove(resources.getString(R.string.settings_color_block3_key));
 		//block style
-		editor.putInt(resources.getString(R.string.settings_color_blockstyle_key), resources.getInteger(R.integer.color_blockstyle_default));
+		editor.remove(resources.getString(R.string.settings_color_blockstyle_key));
 		//ball style
-		editor.putInt(resources.getString(R.string.settings_color_ballstyle_key), resources.getInteger(R.integer.color_ballstyle_default));
+		editor.remove(resources.getString(R.string.settings_color_ballstyle_key));
 		
 		editor.commit();
     }
