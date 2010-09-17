@@ -109,8 +109,14 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
      */
     private int mScreenWidth;
     
+    /**
+     * Width (in pixels) of the game board.
+     */
     private int mGameWidth;
     
+    /**
+     * Height (in pixels) of the game board.
+     */
     private int mGameHeight;
     
     /**
@@ -858,31 +864,21 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 			}
     	}
     	
-    	if (screenWidth > screenHeight) {
-    		this.mIsLandscape = true;
-    		final int temp = screenHeight;
-    		screenHeight = screenWidth;
-    		screenWidth = temp;
-    	} else {
-    		this.mIsLandscape = false;
-    	}
-    	
+    	this.mIsLandscape = (screenWidth > screenHeight);
     	this.mScreenWidth = screenWidth;
     	this.mScreenHeight = screenHeight;
     	
     	if (this.mIsLandscape) {
-    		this.mGameWidth = (screenWidth - this.mDotGridPaddingTop);
-    		this.mCellWidth = this.mGameWidth / (this.mCellsWide * 1.0f);
-    		this.mGameHeight = (screenHeight - (this.mDotGridPaddingBottom + this.mDotGridPaddingLeft + this.mDotGridPaddingRight));
-    		this.mCellHeight = this.mGameHeight / (this.mCellsTall * 1.0f);
+    		this.mGameWidth = (screenWidth - (this.mDotGridPaddingLeft + this.mDotGridPaddingRight + this.mDotGridPaddingBottom));
+    		this.mGameHeight = (screenHeight - this.mDotGridPaddingTop);
     	} else {
     		this.mGameWidth = (screenWidth - (this.mDotGridPaddingLeft + this.mDotGridPaddingRight));
-    		this.mCellWidth = this.mGameWidth / (this.mCellsWide * 1.0f);
     		this.mGameHeight = (screenHeight - (this.mDotGridPaddingTop + this.mDotGridPaddingBottom));
-    		this.mCellHeight = this.mGameHeight / (this.mCellsTall * 1.0f);
     	}
     	
     	//Update cell size
+		this.mCellWidth = this.mGameWidth / (this.mCellsWide * 1.0f);
+		this.mCellHeight = this.mGameHeight / (this.mCellsTall * 1.0f);
     	this.mCellSize.right = this.mCellWidth;
     	this.mCellSize.bottom = this.mCellHeight;
     	
@@ -938,32 +934,10 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
     		c.drawBitmap(this.mBackground, 0, 0, this.mBackgroundPaint);
     	}
         
-        if (this.mIsLandscape) {
-        	//Perform counter-clockwise rotation
-        	c.rotate(-90, this.mScreenWidth / 2.0f, this.mScreenWidth / 2.0f);
-        	c.translate(0, this.mDotGridPaddingLeft);
-        } else {
-        	c.translate(this.mDotGridPaddingLeft, this.mDotGridPaddingTop);
-        }
-        
-        //Draw dots and walls
-        this.drawGameBoard(c);
+    	//Align the Canvas
+    	c.translate(this.mDotGridPaddingLeft, this.mDotGridPaddingTop);
 
-        if (this.mIsLandscape) {
-        	//Perform clockwise rotation back to normal
-        	c.rotate(90, this.mScreenWidth / 2.0f, this.mScreenWidth / 2.0f);
-        }
-        
-        c.restore();
-    }
-
-    /**
-     * Render the dots and walls.
-     * 
-     * @param c Canvas to draw on.
-     */
-    private void drawGameBoard(final Canvas c) {
-    	//draw blocks
+    	//Draw blocks
         for (int y = 0; y < this.mCellsTall; y++) {
         	for (int x = 0; x < this.mCellsWide; x++) {
         		final int cell = this.mBoard[y][x];
@@ -980,9 +954,11 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
         	}
         }
         
-        //draw balls
+        //Draw balls
         for (final Ball ball : this.mBalls) {
         	c.drawRect(ball.getLocationX() - Ball.RADIUS, ball.getLocationY() - Ball.RADIUS, ball.getLocationX() + Ball.RADIUS, ball.getLocationY() + Ball.RADIUS, this.mBallForeground);
         }
+        
+        c.restore();
     }
 }
