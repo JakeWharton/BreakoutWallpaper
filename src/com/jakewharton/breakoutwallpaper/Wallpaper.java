@@ -11,7 +11,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 /**
- * An apple a day...
+ * Breakin' bricks, yo.
  * 
  * @author Jake Wharton
  */
