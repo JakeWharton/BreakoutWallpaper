@@ -138,11 +138,6 @@ public class Wallpaper extends WallpaperService {
         private boolean mIsVisible;
         
         /**
-         * Whether or not the device is in landscape mode.
-         */
-        private boolean mIsLandscape;
-        
-        /**
          * The number of FPS the user wants us to render.
          */
         private int mFPS;
@@ -274,12 +269,7 @@ public class Wallpaper extends WallpaperService {
         			this.mLastTouch = 0;
         		} else if (this.mIsControllable) {
 	        		this.mLastTouch = touch;
-	        		
-	        		if (this.mIsLandscape) {
-	        			this.mGame.setTouch(event.getY(), event.getX());
-	        		} else {
-	        			this.mGame.setTouch(event.getX(), event.getY());
-	        		}
+	        		this.mGame.setTouch(event.getX(), event.getY());
         		}
         		
         		if (!Wallpaper.AUTO_FPS) {
@@ -296,8 +286,6 @@ public class Wallpaper extends WallpaperService {
         	}
         	
             super.onSurfaceChanged(holder, format, width, height);
-            
-            this.mIsLandscape = (width > height);
             
             this.mScreenCenterX = width / 2.0f;
             this.mScreenCenterY = height / 2.0f;
