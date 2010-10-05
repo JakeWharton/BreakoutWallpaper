@@ -1,9 +1,7 @@
 package com.jakewharton.breakoutwallpaper;
 
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Random;
-import com.jakewharton.utilities.WidgetLocationsPreference;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -15,6 +13,8 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
+import com.jakewharton.utilities.WidgetLocationsPreference;
 
 public class Game implements SharedPreferences.OnSharedPreferenceChangeListener {
 	/**
@@ -857,9 +857,10 @@ public class Game implements SharedPreferences.OnSharedPreferenceChangeListener 
 				
 	    		final Bitmap scaled = Bitmap.createScaledBitmap(temp, newWidth, newHeight, false);
 	    		this.mBackground = Bitmap.createBitmap(scaled, x, y, screenWidth, screenHeight);
-			} catch (FileNotFoundException e) {
+			} catch (final Exception e) {
 				e.printStackTrace();
 				Log.w(Game.TAG, "Unable to load background bitmap.");
+				Toast.makeText(Wallpaper.CONTEXT, "Unable to load background bitmap.", Toast.LENGTH_SHORT).show();
 				this.mBackground = null;
 			}
     	}
